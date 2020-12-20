@@ -18,7 +18,7 @@ mongoose.connect(mongo_uri, { useNewUrlParser: true }).then(
 );
 
 var app = express();
-app.use(express.static(path.join(__dirname, 'mini-react/build')));
+app.use(express.static(path.join(__dirname, 'react-liff/build')));
 
 app.use(cors());
 
@@ -33,13 +33,13 @@ app.listen(port, () => {
 
 // Handles any requests that don't match the ones above
 app.get('*', (req,res) =>{
-	res.sendFile(path.join(__dirname+'/mini-react/build/index.html'));
+	res.sendFile(path.join(__dirname+'/react-liff/build/index.html'));
 });
 
-app.get("/", (req, res) => {
-  res.status(200).send("hello express");
-  //.sendFile("/app/views/index.html");
-});
+// app.get("/", (req, res) => {
+//   res.status(200).send("hello express");
+//   //.sendFile("/app/views/index.html");
+// });
 
 var User = require("./userrouter");
 app.use("/api/user", User);
