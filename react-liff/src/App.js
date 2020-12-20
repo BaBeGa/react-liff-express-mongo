@@ -21,9 +21,10 @@ class App extends Component {
 
 
   getList = () => {
-    fetch('/api/getList')
+    
+    fetch('/api/user')
     .then(res => res.json())
-    .then(user => this.setState({ user : user }))
+    .then(user => { console.log('getlist' , user);  this.setState({ user : user })})
   }
 
   getProfile() {
@@ -31,29 +32,30 @@ class App extends Component {
     if(serializedState){
       this.user = JSON.parse(serializedState);
     }
+
     this.setState({user: this.user});
     console.log('user : ', this.user);
-    if(!this.user){
-      liff.init({ liffId: "1655424183-wzDgvLRj" } ,async () => {
-        if (liff.isLoggedIn()) {
-          let userProfile = await liff.getProfile();
-          let idToken = await liff.getDecodedIDToken();
-          this.setState({
-            user : {
-              name: userProfile.displayName,
-              email: idToken.email,
-              userLineID: userProfile.userId,
-              pictureUrl: userProfile.pictureUrl,
-              statusMessage: userProfile.statusMessage
-            }
-          });
+    // if(!this.user){
+    //   liff.init({ liffId: "1655424183-wzDgvLRj" } ,async () => {
+    //     if (liff.isLoggedIn()) {
+    //       let userProfile = await liff.getProfile();
+    //       let idToken = await liff.getDecodedIDToken();
+    //       this.setState({
+    //         user : {
+    //           name: userProfile.displayName,
+    //           email: idToken.email,
+    //           userLineID: userProfile.userId,
+    //           pictureUrl: userProfile.pictureUrl,
+    //           statusMessage: userProfile.statusMessage
+    //         }
+    //       });
   
-          this.saveUser();
-        } else {
-          liff.login();
-        }
-      });
-    }
+    //       this.saveUser();
+    //     } else {
+    //       liff.login();
+    //     }
+    //   });
+    // }
   }
 
   saveUser(){
@@ -63,6 +65,7 @@ class App extends Component {
 
   componentDidMount() {
     this.getProfile()
+    this.getList()
   }
 
   render(){
