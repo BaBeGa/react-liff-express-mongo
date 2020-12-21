@@ -4,25 +4,45 @@ import './HomePage.css';
 class HomePage extends Component{
     constructor(props) {
         super(props);
-        this.state = {
-            user: {
-              name: '',
-              email: '',
-              userLineID: '',
-              pictureUrl: '',
-              statusMessage: ''
-            }
-        };
+        this.getUser = this.getUser.bind(this)
+        this. state = {
+          user: {
+            name: '',
+            email: '',
+            userLineID: '',
+            pictureUrl: '',
+            statusMessage: '',
+            coupons:[]
+          }
+      };
     }
 
-    getUser(){
+    //to get userData and display on home page
+    getUser = () => {
+      try{
         let serializedState = localStorage.getItem('user');
         if(serializedState){
-        this.user = JSON.parse(serializedState);
+          this.user = JSON.parse(serializedState);
+          this.setState({user: this.user});
         }
-        console.log('getuser: ', this.user);
-        this.setState({user : this.user});
+        console.log('state : ', this.state);
+        console.log('user local : ', this.user);
+        fetch('/api/user/'+this.user.userLineID)
+        .then(res => res.json())
+        .then(user => { console.log('getuser' , user );  this.setState({ user : user })})
+      }catch (e){
+        console.log('exception : ', e);
+      }
     }
+
+    // getUser(){
+    //     let serializedState = localStorage.getItem('user');
+    //     if(serializedState){
+    //     this.user = JSON.parse(serializedState);
+    //     }
+    //     console.log('getuser: ', this.user);
+    //     this.setState({user : this.user});
+    // }
 
     componentDidMount() {
         this.getUser()
@@ -69,6 +89,12 @@ class HomePage extends Component{
                   :
                   <p>statusMessage = null</p>
               }
+              {
+                this.state.user.coupons.map((value, index) => {
+                  return <p key={index}> details: {value.details}, status : {value.status}</p>
+                })
+              }
+
               </div>
         </div>
         );
