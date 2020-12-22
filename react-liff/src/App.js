@@ -7,7 +7,6 @@ import { Button } from 'react-bootstrap';
 const liff = window.liff;
 
 class App extends Component {
-  
   constructor(props) {
     super(props);
     this.saveUser = this.saveUser.bind(this)
@@ -65,13 +64,14 @@ class App extends Component {
       body: user
     };
     const response = await fetch('/api/user', requestOptions);
-    const data = await response.json();
-    console.log('response : ',data);
     
-    let serializedState = JSON.stringify(this.state.user);
-    localStorage.setItem('user', serializedState);
+    const obj = Object.assign({isRegistered: true}, this.state.user)
+    localStorage.setItem('user', JSON.stringify(obj));
+    this.setState({user: obj});
+    console.log('registered : ',obj);
+
     }catch (e){
-      console.log('exception : ',e);
+      console.log('exception : ');
     }
     
   }
@@ -82,7 +82,7 @@ class App extends Component {
   }
 
   render(){
-    if(this.user){
+    if(this.state.user.isRegistered){
       return(
         <div>
           <HomePage/>
