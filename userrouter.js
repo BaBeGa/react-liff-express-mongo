@@ -11,8 +11,8 @@ router.get("/", (req, res) => {
 });
 
 //GET by LINE ID
-router.get("/:_id", (req, res) => {
-  Food.findOne({userLineID: _id}).exec((err, data) => {
+router.get("/:id", (req, res) => {
+  User.findOne({userLineID: req.params.id}).exec((err, data) => {
     if (err) return res.status(400).send(err);
     res.status(200).send(data);
   });
@@ -22,9 +22,10 @@ router.get("/:_id", (req, res) => {
 // POST (create new user)
 router.post("/", (req, res) => {
   var obj = new User(req.body);
+  console.log('post user : ',req.body);
   obj.save((err, data) => {
     if (err) return res.status(400).send(err);
-    res.status(200).send("regist success",data);
+    res.status(200).send("regist success");
   });
 });
 

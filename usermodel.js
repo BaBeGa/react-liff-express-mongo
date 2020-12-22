@@ -37,9 +37,6 @@ var userSchema = mongoose.Schema(
         type: [couponSchema]
     }
   },
-  {
-    collection: "user"
-  },
   { timestamps: true }
 );
 
