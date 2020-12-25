@@ -1,8 +1,22 @@
-import logo from './logo.svg';
 import React, { Component } from 'react';
 import './App.css';
 import HomePage from './HomePage';
-import { Button } from 'react-bootstrap';
+import logo from './assets/yellow.png';
+import { 
+  Col,
+  Button, 
+  Form, 
+  FormGroup, 
+  Container, 
+  ModalHeader, 
+  ModalBody,
+  ModalFooter, 
+  Modal, 
+  Input, 
+  InputGroup,
+  Label
+ } from "reactstrap";
+import Datetime from "react-datetime";
 
 const liff = window.liff;
 
@@ -10,7 +24,12 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.saveUser = this.saveUser.bind(this)
+    this.closeModal = this.closeModal.bind(this, false);
+    this.showModal = this.showModal.bind(this, false);
+    this.check = this.check.bind(this, false);
     this.state = {
+      validated: false,
+      showModal: false,
       user: {
         name: '',
         email: '',
@@ -51,8 +70,20 @@ class App extends Component {
     }
   }
 
-  saveUser = async () =>{
+  check(){
+    this.setState({validated: !this.state.validated})
+  }
 
+
+  closeModal(){
+    this.setState({showModal: false})
+  }
+
+  showModal(){
+    this.setState({showModal: true})
+  }
+
+  saveUser = async () =>{
     try{
       // POST request using fetch with async/await
     console.log('state : ',this.state);
@@ -64,14 +95,14 @@ class App extends Component {
       body: user
     };
     const response = await fetch('/api/user', requestOptions);
+    // const data = await response.json();
+    // console.log('response : ',data);
     
-    const obj = Object.assign({isRegistered: true}, this.state.user)
-    localStorage.setItem('user', JSON.stringify(obj));
-    this.setState({user: obj});
-    console.log('registered : ',obj);
-
+    let serializedState = JSON.stringify(this.state.user);
+    localStorage.setItem('user', serializedState);
+    this.setState({isLoggedIn: true});
     }catch (e){
-      console.log('exception : ');
+      console.log('exception : ',e);
     }
     
   }
@@ -82,7 +113,7 @@ class App extends Component {
   }
 
   render(){
-    if(this.state.user.isRegistered){
+    if(this.state.isLoggedIn){
       return(
         <div>
           <HomePage/>
@@ -91,49 +122,80 @@ class App extends Component {
     }
     else{
       return (
-        <div className="App">
-          <div className="support">
-              {
-                (this.state.user && this.state.user.pictureUrl && this.state.user.pictureUrl !== '')
-                  ?
-                  <img width="25%" src={this.state.user.pictureUrl} />
+        <div className="App"> 
+          <Modal isOpen={this.state.showModal} fade={false}>
+            <ModalHeader style={{fontWeight: "bold"}}>ข้อตกลงและเงื่อนไข</ModalHeader>
+            <ModalBody>
+              <p>
+              ก่อนที่ท่านจะตกลงสมัครเป็นผู้ใช้บริการในเว็บไซต์นี้
+              ท่านจำเป็นต้องอ่านและยอมรับเงื่อนไขทุกประการตามข้อตกลงนี้
+
+              และตามนโยบายข้อมูลส่วนบุคคลของบริษัท
+              ก่อนที่ท่านจะตกลงสมัครเป็นผู้ใช้บริการในเว็บไซต์นี้
+
+              ท่านจำเป็นต้องอ่านและยอมรับเงื่อนไขทุกประการตามข้อตกลงนี้
+              และตามนโยบายข้อมูลส่วนบุคคลของบริษัท
+              </p>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" onClick={this.closeModal}>ตกลง</Button>
+            </ModalFooter>
+          </Modal>
+
+            {
+              (this.state.user && this.state.user.userLineID) ?
+              <Container>
+                {
+                  (this.state.user && this.state.user.pictureUrl && this.state.user.pictureUrl !== '') ?
+                  <div className="profile">
+                    <div className="photo-container">
+                    <img alt="..." src={this.state.user.pictureUrl}></img>
+                    </div>
+                  </div>
                   :
-                  <p>pictureUrl = null</p>
-              }
-          </div>
-          <div className="userData">
-            {
-              (this.state.user && this.state.user.name && this.state.user.name !== '')
-                ?
-                <p>Name: {this.state.user.name}</p>
-                :
-                <p>Name = null</p>
+                  null
+                }
+                <h3 className="title">สวัสดี</h3>
+                <h5>{this.state.user.name}</h5>
+                <div className="divider"></div>
+                <div className="content">
+                <h3>ยินดีต้อนรับเข้าสู่ระบบ</h3>
+                <Form action="" className="form" method="">
+                  <h5>กรุณาให้ข้อมูลเพื่อรับสิทธิพิเศษต่างๆ</h5>
+                  <FormGroup>
+                    <div className="center-input">
+                      <InputGroup>
+                        <Input
+                          placeholder="เบอร์โทรศัพธ์"
+                          type="text"
+                        ></Input>
+                      </InputGroup>
+                      <Datetime timeFormat={false} inputProps={{ placeholder: "วัน เดือน ปีเกิด" }}/>
+                    </div>
+                    
+                  </FormGroup>
+
+                  <div className="bottom">
+                  <Label>
+                        <Input type="checkbox" onChange={this.check} value={this.state.validated}></Input>
+                        <span className="form-check-sign"></span>
+                        <Button onClick={this.showModal} color="link">ยอมรับข้อตกลงและเงื่อนไข</Button>
+                  </Label>
+                  <div>
+                  <img className="logo" alt="logo" src={logo}></img>
+                  </div>
+
+                  <Button disabled={!this.state.validated} onClick={this.saveUser} style={{color: "#636363",backgroundColor: this.state.validated ? "#f5d80f" : "#c4c4c4"}} className="btn-login">
+                      เข้าสู่ระบบ
+                  </Button>
+                  </div>
+                  
+                </Form>
+                </div>
+              </Container>
+              :
+              <div className="loading-center"></div>
             }
-            {
-              (this.state.user && this.state.user.email && this.state.user.email !== '')
-                ?
-                <p>e-mail: {this.state.user.email}</p>
-                :
-                <p>email = null</p>
-            }
-            {
-              ( this.state.user && this.state.user.userLineID && this.state.user.userLineID !== '')
-                ?
-                <p>LineID: {this.state.user.userLineID}</p>
-                :
-                <p>LineID = null</p>
-            }
-            {
-              (this.state.user && this.state.user.statusMessage && this.state.user.statusMessage !== '')
-                ?
-                <p>statusMessage: {this.state.user.statusMessage}</p>
-                :
-                <p>statusMessage = null</p>
-            }
-            </div>
-            <div className="button login">
-              <Button onClick={this.saveUser} variant="warning" size="lg">Register</Button>
-            </div>
         </div>
       );
     }
